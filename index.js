@@ -55,6 +55,24 @@ async function run() {
       if (!result) return res.status(404).send({ message: 'User Not Found.' })
       res.send({ role: result?.role })
     })
+    // update  user's role
+    app.patch(
+      '/user/role/update/:email',
+      async (req, res) => {
+        const email = req.params.email
+        const { role } = req.body
+        console.log(role)
+        const filter = { email: email }
+        const updateDoc = {
+          $set: {
+            role,
+          },
+        }
+        const result = await usersCollection.updateOne(filter, updateDoc)
+        console.log(result)
+        res.send(result)
+      }
+    )
 
     // scholarchip related api
     app.get('/scholarship',async(req,res)=>{
