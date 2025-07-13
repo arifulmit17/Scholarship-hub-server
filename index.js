@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express')
 const cors = require('cors');
 //const jwt = require('jsonwebtoken')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -42,6 +42,19 @@ async function run() {
         const result=await usersCollection.insertOne(userdata)
         res.send(result)
     })
+    // get all users data
+    app.get('/user', async (req, res) => {
+      
+      const result = await usersCollection.find().toArray()
+      res.send(result)
+    })
+    // get a user's role
+    app.get('/user/role/:email', async (req, res) => {
+      const email = req.params.email
+      const result = await usersCollection.findOne({ email })
+      if (!result) return res.status(404).send({ message: 'User Not Found.' })
+      res.send({ role: result?.role })
+    })
 
     // scholarchip related api
     app.get('/scholarship',async(req,res)=>{
@@ -49,6 +62,24 @@ async function run() {
         const result=await scholarshipCollection.find().toArray()
         res.send(result)
     })
+
+    app.get('/scholarship/:id', async (req, res) => {
+            // const token = req?.headers?.authorization?.split(' ')[1]
+            // if (token) {
+            //     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+            //         if (err) {
+            //             console.log(err);
+            //         }
+            //         console.log(decoded)
+            //     })
+            // }
+
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+
+            const result = await scholarshipCollection.findOne(query);
+            res.send(result);
+        })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
