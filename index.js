@@ -28,6 +28,8 @@ const client = new MongoClient(uri, {
 async function run() {
     const db=client.db('scholarshipdb')
     const scholarshipCollection=db.collection('scholarships')
+    const applicationCollection=db.collection('applications')
+    const reviewCollection=db.collection('reviews')
     const usersCollection=db.collection('users')
 
   try {
@@ -88,6 +90,7 @@ async function run() {
         const result=await scholarshipCollection.find().toArray()
         res.send(result)
     })
+    
 
     app.get('/scholarship/:id', async (req, res) => {
             // const token = req?.headers?.authorization?.split(' ')[1]
@@ -106,6 +109,24 @@ async function run() {
             const result = await scholarshipCollection.findOne(query);
             res.send(result);
         })
+
+    // Application related api
+    app.post('/add-application',async (req, res)=>{
+      const application =req.body
+      const result=await applicationCollection.insertOne(application)
+      res.send(result)
+    })
+    // get application data based on user email
+    app.get('/application/:email',async (req, res)=>{
+      const userEmail = req.params.email
+      const result = await applicationCollection.find({ userEmail }).toArray()
+      res.send(result)
+    })
+    // get all applications
+    app.get('/applications/',async (req, res)=>{
+      const result = await applicationCollection.find().toArray()
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
