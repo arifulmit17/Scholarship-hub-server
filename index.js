@@ -115,7 +115,12 @@ async function run() {
       const result=await scholarshipCollection.insertOne(scholarship)
       res.send(result)
     })
-
+    // Review related api
+    app.post('/add-review',async (req, res)=>{
+      const review =req.body
+      const result=await reviewCollection.insertOne(review)
+      res.send(result)
+    })
     // Application related api
     app.post('/add-application',async (req, res)=>{
       const application =req.body
