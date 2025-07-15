@@ -121,6 +121,12 @@ async function run() {
       const result=await reviewCollection.insertOne(review)
       res.send(result)
     })
+    // get review api
+    app.get('/review/:email',async(req,res)=>{
+      const userEmail = req.params.email
+      const result = await reviewCollection.find({ userEmail }).toArray()
+      res.send(result)
+    })
     // Application related api
     app.post('/add-application',async (req, res)=>{
       const application =req.body
