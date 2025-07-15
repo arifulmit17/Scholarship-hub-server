@@ -127,6 +127,41 @@ async function run() {
       const result = await applicationCollection.find().toArray()
       res.send(result)
     })
+    // update aplication status
+    app.patch(
+      '/application/status/update/:id',
+      async (req, res) => {
+        const id = req.params.id
+        const { status } = req.body
+        console.log(status)
+        const filter = { _id: new ObjectId(id) }
+        const updateDoc = {
+          $set: {
+            applicationStatus:status,
+          },
+        }
+        const result = await applicationCollection.updateOne(filter, updateDoc)
+        console.log(result)
+        res.send(result)
+      }
+    )
+    // add application feedback
+    app.patch(
+      '/application/feedback/update/:id',
+      async (req, res) => {
+        const id = req.params.id
+        const { feedback } = req.body
+        const filter = { _id: new ObjectId(id) }
+        const updateDoc = {
+          $set: {
+            feedback:feedback,
+          },
+        }
+        const result = await applicationCollection.updateOne(filter, updateDoc)
+        console.log(result)
+        res.send(result)
+      }
+    )
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
