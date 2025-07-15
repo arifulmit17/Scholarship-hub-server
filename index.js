@@ -110,6 +110,12 @@ async function run() {
             res.send(result);
         })
 
+    app.post('/add-scholarship',async (req, res)=>{
+      const scholarship =req.body
+      const result=await scholarshipCollection.insertOne(scholarship)
+      res.send(result)
+    })
+
     // Application related api
     app.post('/add-application',async (req, res)=>{
       const application =req.body
