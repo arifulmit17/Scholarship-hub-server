@@ -115,6 +115,13 @@ async function run() {
       const result=await scholarshipCollection.insertOne(scholarship)
       res.send(result)
     })
+    // delete scholarship api
+    app.delete('/deletescholarship/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await scholarshipCollection.deleteOne(query);
+      res.send(result)
+    })
     // Review related api
     app.post('/add-review',async (req, res)=>{
       const review =req.body
@@ -191,6 +198,13 @@ async function run() {
         res.send(result)
       }
     )
+    // delete application api
+    app.delete('/deleteapplication/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await applicationCollection.deleteOne(query);
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
