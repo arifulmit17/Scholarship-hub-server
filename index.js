@@ -132,6 +132,13 @@ async function run() {
       const result = await reviewCollection.find().toArray()
       res.send(result)
     })
+    // delete review api
+    app.delete('/deletereview/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await reviewCollection.deleteOne(query);
+      res.send(result)
+    })
     // Application related api
     app.post('/add-application',async (req, res)=>{
       const application =req.body
