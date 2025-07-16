@@ -127,6 +127,11 @@ async function run() {
       const result = await reviewCollection.find({ userEmail }).toArray()
       res.send(result)
     })
+    // get all review api
+    app.get('/review',async(req,res)=>{
+      const result = await reviewCollection.find().toArray()
+      res.send(result)
+    })
     // Application related api
     app.post('/add-application',async (req, res)=>{
       const application =req.body
