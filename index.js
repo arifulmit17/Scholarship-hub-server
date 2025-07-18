@@ -139,6 +139,23 @@ async function run() {
       const result = await reviewCollection.find().toArray()
       res.send(result)
     })
+    // update review api
+    app.put(
+      '/reviewupdate/:id',
+      async (req, res) => {
+        const id = req.params.id;
+        const options = { upsert: true };
+        const updatedrev = req.body;
+        delete updatedrev._id;
+        const filter = { _id: new ObjectId(id) }
+        const updateDoc = {
+          $set:updatedrev,
+        }
+        const result = await reviewCollection.updateOne(filter, updateDoc,options)
+        console.log(result)
+        res.send(result)
+      }
+    )
     // delete review api
     app.delete('/deletereview/:id',async(req,res)=>{
       const id = req.params.id;
@@ -177,6 +194,23 @@ async function run() {
           },
         }
         const result = await applicationCollection.updateOne(filter, updateDoc)
+        console.log(result)
+        res.send(result)
+      }
+    )
+    // update application
+    app.put(
+      '/application/update/:id',
+      async (req, res) => {
+        const id = req.params.id;
+        const options = { upsert: true };
+        const updatedapp = req.body;
+        delete updatedapp._id;
+        const filter = { _id: new ObjectId(id) }
+        const updateDoc = {
+          $set:updatedapp,
+        }
+        const result = await applicationCollection.updateOne(filter, updateDoc,options)
         console.log(result)
         res.send(result)
       }
