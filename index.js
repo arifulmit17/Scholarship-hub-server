@@ -151,6 +151,12 @@ async function run() {
       const result = await reviewCollection.find({ userEmail }).toArray()
       res.send(result)
     })
+    // get review based on scholarship
+    app.get('/reviews/:id',async(req,res)=>{
+      const scholarshipId = req.params.id
+      const result = await reviewCollection.find({ scholarshipId }).toArray()
+      res.send(result)
+    })
     // get all review api
     app.get('/review',async(req,res)=>{
       const result = await reviewCollection.find().toArray()
