@@ -115,6 +115,23 @@ async function run() {
       const result=await scholarshipCollection.insertOne(scholarship)
       res.send(result)
     })
+    // update scholarship api
+    app.put(
+      '/scholarshipupdate/:id',
+      async (req, res) => {
+        const id = req.params.id;
+        const options = { upsert: true };
+        const updatedscholarship = req.body;
+        delete updatedscholarship._id;
+        const filter = { _id: new ObjectId(id) }
+        const updateDoc = {
+          $set:updatedscholarship,
+        }
+        const result = await scholarshipCollection.updateOne(filter, updateDoc,options)
+        console.log(result)
+        res.send(result)
+      }
+    )
     // delete scholarship api
     app.delete('/deletescholarship/:id',async(req,res)=>{
       const id = req.params.id;
