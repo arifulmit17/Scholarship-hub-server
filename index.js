@@ -39,8 +39,14 @@ async function run() {
     app.post('/user',async(req,res)=>{
         const userdata=req.body
         userdata.role="user"
-        userdata.created_at=Date.now()
-        userdata.last_loggedIn=Date.now()
+        userdata.created_at=new Date().toISOString()
+        userdata.last_loggedIn=new Date().toISOString()
+        const query={email:userdata?.email}
+        const alreadyExists=await usersCollection.findOne(query)
+        if(!!alreadyExists){
+          const result=await usersCollection.updateOne(query,{$set:{last_loggedIn: new Date().toISOString()}})
+          return res.send(result)
+        }
         const result=await usersCollection.insertOne(userdata)
         res.send(result)
     })
@@ -83,6 +89,13 @@ async function run() {
         res.send(result)
       }
     )
+    // delete user api
+    app.delete('/deleteuser/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await usersCollection.deleteOne(query);
+      res.send(result)
+    })
 
     // scholarchip related api
     app.get('/scholarship',async(req,res)=>{
