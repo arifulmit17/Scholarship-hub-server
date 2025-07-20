@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express')
 const cors = require('cors');
-//const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 3000
@@ -35,6 +35,16 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    // jwt related api
+        app.post('/jwt', (req, res) => {
+            const user = { email: req.body.email }
+            console.log(user);
+            const token = jwt.sign(user, process.env.JWT_SECRET_KEY, {
+                expiresIn: "14d"
+            })
+            res.send({ token, message: "jwt token created successfully" })
+
+        })
     // user related api
     app.post('/user',async(req,res)=>{
         const userdata=req.body
@@ -85,7 +95,6 @@ async function run() {
           },
         }
         const result = await usersCollection.updateOne(filter, updateDoc)
-        console.log(result)
         res.send(result)
       }
     )
@@ -106,15 +115,7 @@ async function run() {
     
 
     app.get('/scholarship/:id', async (req, res) => {
-            // const token = req?.headers?.authorization?.split(' ')[1]
-            // if (token) {
-            //     jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-            //         if (err) {
-            //             console.log(err);
-            //         }
-            //         console.log(decoded)
-            //     })
-            // }
+          
 
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
@@ -160,7 +161,21 @@ async function run() {
     })
     // get review api
     app.get('/review/:email',async(req,res)=>{
-      const userEmail = req.params.email
+      const token = req?.headers?.authorization?.split(' ')[1]
+            if (token) {
+                jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+                    if (err) {
+                        console.log(err);
+                    }
+            
+                    req.decodedemail = decoded.email
+                })
+            }
+            const userEmail = req.params.email
+      
+            if (userEmail !== req.decodedemail) {
+                return res.status(403).send({ message: 'you are not authorized' });
+            }
       const result = await reviewCollection.find({ userEmail }).toArray()
       res.send(result)
     })
@@ -207,7 +222,20 @@ async function run() {
     })
     // get application data based on user email
     app.get('/application/:email',async (req, res)=>{
+      const token = req?.headers?.authorization?.split(' ')[1]
+            if (token) {
+                jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    console.log(decoded)
+                    req.decodedemail = decoded.email
+                })
+            }
       const userEmail = req.params.email
+      if (userEmail !== req.decodedemail) {
+                return res.status(403).send({ message: 'you are not authorized' });
+            }
       const result = await applicationCollection.find({ userEmail }).toArray()
       res.send(result)
     })
