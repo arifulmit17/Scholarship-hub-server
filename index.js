@@ -2,16 +2,13 @@ require('dotenv').config();
 const express = require('express')
 const cors = require('cors');
 const jwt = require('jsonwebtoken')
+const stripe=require('stripe')(process.env.STRIPE_SK_KEY)
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 3000
 
 app.use(cors());
 app.use(express.json());
-
-// DB_USER=Scholar
-// DB_PASS=CGVpT6O8ypuwbvEd
-
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.52sdtnn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -34,7 +31,7 @@ async function run() {
 
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // jwt related api
         app.post('/jwt', (req, res) => {
             const user = { email: req.body.email }
@@ -45,6 +42,22 @@ async function run() {
             res.send({ token, message: "jwt token created successfully" })
 
         })
+        // stripe related api
+    app.post('/create-payment-intent',async (req,res)=>{
+      let {amount}=req.body
+      amount=amount*100
+      console.log(amount);
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+      currency: 'usd',
+      automatic_payment_methods: {
+        enabled: true,
+      },      
+},
+
+);
+    res.send({clientsecret:paymentIntent.client_secret,paymentIntent})
+    })
     // user related api
     app.post('/user',async(req,res)=>{
         const userdata=req.body
@@ -305,7 +318,7 @@ async function run() {
     })
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
